@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mailer POC</title>
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="jumbotron">
+      <h1 class="text-center"><span class="fa fa-envelope"></span> You've got mail</h1>
+      <hr>
+      <h2 class="text-center">Fill out the form and click submit</h2>
+      <br>
+    </div>
+
+    <form>
+      <label for="name">Full name</label>
+      <input id="name" type="text" name="name">
+      <br>
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email">
+      <br>
+      <label for="message">Message</label>
+      <input type="text" name="message" id="message">
+      <br>
+      <button type="submit" id="submit">Submit</button>
+    </form>
+
+  </div>
+
+</body>
+
+<script>
+  document.getElementById('submit').addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const nameNode = document.getElementById('name');
+    const emailNode = document.getElementById('email');
+    const messageNode = document.getElementById('message')
+
+    const mailObj = {
+      name: nameNode.value.trim(),
+      email: emailNode.value.trim(),
+      message: messageNode.value.trim(),
+    };
+
+    // fetch won't work in IE, FYI
+    fetch('/api/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(mailObj)
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          // reset form
+          nameNode.value = '';
+          emailNode.value = '';
+          messageNode.value = '';
+
+          // you wont want to use alerts in your actual app
+          alert('message sent successfully');
+        } else {
+          alert('something went wrong with nodemailer');
+        }
+      })
+      .catch((error) => {
+        alert('something went wrong between the server and frontend', error);
+      });
+  })
+</script>
+</html>
